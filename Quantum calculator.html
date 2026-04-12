@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Calculator</title>
+    <style>
+        /* The "Old Tech" Aesthetic */
+        body {
+            background-color: #0a0a0a;
+            color: #33ff33;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            text-shadow: 0 0 5px #33ff33;
+        }
+
+        /* CRT Scanline Effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        #terminal {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            word-wrap: break-word;
+        }
+
+        .input-area {
+            display: flex;
+            padding: 20px;
+            background: #000;
+            border-top: 1px solid #33ff33;
+        }
+
+        #cmd-input {
+            background: transparent;
+            border: none;
+            color: #33ff33;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.2rem;
+            outline: none;
+            flex: 1;
+        }
+
+        .cursor {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="terminal">
+    <div class="log-entry">QUANTUM CORE INITIALIZED...</div>
+    <div class="log-entry">AWAITING INPUT COMMANDS_</div>
+</div>
+
+<div class="input-area">
+    <span>>&nbsp;</span>
+    <input type="text" id="cmd-input" autofocus autocomplete="off">
+</div>
+
+<script>
+    const terminal = document.getElementById('terminal');
+    const input = document.getElementById('cmd-input');
+
+    // Handle the "Enter" key
+    input.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            const val = input.value;
+            if (val.trim() === "") return;
+
+            addLog(`>> ${val}`);
+            processCalculation(val);
+            input.value = "";
+        }
+    });
+
+    function addLog(text) {
+        const div = document.createElement('div');
+        div.className = 'log-entry';
+        div.innerText = text;
+        terminal.appendChild(div);
+        terminal.scrollTop = terminal.scrollHeight;
+        return div; // Return for dynamic updating
+    }
+
+    async function processCalculation(expression) {
+        const loadingDiv = addLog("ANALYZING TEMPORAL VECTORS [ ]");
+        const startTime = Date.now();
+        const duration = 6000; // 6 Seconds
+        const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+        let i = 0;
+
+        // Dynamic Processing Animation
+        const interval = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.round((elapsed / duration) * 100);
+            loadingDiv.innerText = `PROCESSING QUANTUM DATA ${frames[i % frames.length]} ${progress}%`;
+            i++;
+        }, 100);
+
+        // The Wait
+        await new Promise(resolve => setTimeout(resolve, duration));
+        
+        clearInterval(interval);
+
+        try {
+            // Using Function() instead of eval() for slightly better "modern" handling
+            const result = Function(`return (${expression})`)();
+            loadingDiv.innerText = `COMPUTATION SUCCESSFUL.`;
+            addLog(`RESULT: ${result}`);
+        } catch (error) {
+            loadingDiv.innerText = `COMPUTATION FAILED.`;
+            addLog(`ERROR: SEQUENCE UNRECOGNIZABLE.`);
+        }
+        addLog("--------------------------------");
+    }
+</script>
+
+</body>
+</html>
